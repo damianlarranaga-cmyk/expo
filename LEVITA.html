@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>LEVITA OS | Gestión Ministerial</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Levita App">
+    <meta name="description" content="Gestión de excelencia para ministerios de alabanza.">
+
+    <!-- Web App Manifest (Embedded for Single File Portability) -->
+    <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIkxFVklUQSBPUyIsCiAgInNob3J0X25hbWUiOiJMZXZpdGEiLAogICJzdGFydF91cmwiOiAiLiIsCiAgImRpc3BsYXkiOiAic3RhbmRhbG9uZSIsCiAgImJhY2tncm91bmRfY29xvciOiAiIzFhMjAyYyIsCiAgInRoZW1lX2NvbG9yIjogIiMxZTNhOGEiLAogICJpY29ucyI6IFt7CiAgICAic3JjIjogImh0dHBzOi8vdmlhLnBsYWNlaG9sZGVyLmNvbS8xOTIueGZwbmdcP3RleHQ9TGV2aXRhIiwKICAgICJzaXplcyI6ICIxOTJ4MTkyIiwKICAgICJ0eXBlIjogImltYWdlL3BuZyIKICB9XQp9">
+
+    <style>
+        /* * ==========================================
+         * CORE DESIGN SYSTEM & VARIABLES
+         * ==========================================
+         */
+        :root {
+            /* Palette: Divine Royal Blue & Gold Excellence */
+            --primary: #1e3a8a;       /* Deep Royal Blue - Authority/Trust */
+            --primary-light: #3b82f6; /* Vivid Blue - Action */
+            --primary-dark: #172554;  /* Midnight - Depth */
+            --accent: #d97706;        /* Amber Gold - Glory/Highlight */
+            --bg-body: #f8fafc;       /* Clean Slate */
+            --bg-card: #ffffff;       /* Pure White */
+            --text-main: #1e293b;     /* Slate 900 */
+            --text-muted: #64748b;    /* Slate 500 */
+            --success: #10b981;       /* Emerald */
+            --danger: #ef4444;        /* Red */
+            
+            /* Spacing & Layout */
+            --radius-sm: 0.5rem;
+            --radius-md: 1rem;
+            --radius-lg: 1.5rem;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-floating: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            /* Typography */
+            --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            
+            /* Animation */
+            --trans-fast: 0.2s ease;
+            --trans-med: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #0f172a;
+                --bg-card: #1e293b;
+                --text-main: #f1f5f9;
+                --text-muted: #94a3b8;
+                --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        /* * ==========================================
+         * RESET & BASE STYLES
+         * ==========================================
+         */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.5;
+            overflow-x: hidden;
+            padding-bottom: 90px; /* Space for Nav */
+            user-select: none; /* App-like feel */
+        }
+
+        button { font-family: inherit; cursor: pointer; border: none; outline: none; }
+        input, select, textarea { font-family: inherit; font-size: 16px; } /* 16px prevents zoom on iOS */
+
+        /* * ==========================================
+         * UTILITY CLASSES & LAYOUT
+         * ==========================================
+         */
+        .container { max-width: 800px; margin: 0 auto; padding: 1rem; }
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .w-full { width: 100%; }
+        .text-center { text-align: center; }
+        .font-bold { font-weight: 700; }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .text-accent { color: var(--accent); }
+        .mb-4 { margin-bottom: 1rem; }
+
+        /* * ==========================================
+         * COMPONENTS
+         * ==========================================
+         */
+        
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem 1rem 3rem 1rem;
+            border-bottom-left-radius: 2rem;
+            border-bottom-right-radius: 2rem;
+            box-shadow: var(--shadow-soft);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title h1 { font-size: 1.5rem; letter-spacing: -0.5px; }
+        .app-title span { color: var(--accent); font-size: 0.8em; text-transform: uppercase; letter-spacing: 2px; display: block; }
+        
+        .install-btn {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            color: white;
+            transition: var(--trans-fast);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+            box-shadow: var(--shadow-soft);
+            margin-bottom: 1rem;
+            transition: transform var(--trans-fast);
+            animation: slideUp 0.4s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            padding-bottom: 0.5rem;
+        }
+
+        .card-title { font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 0.5rem; }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            transition: var(--trans-med);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:active { transform: scale(0.96); }
+
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3); }
+        .btn-accent { background: var(--accent); color: white; }
+        .btn-ghost { background: transparent; color: var(--text-muted); padding: 0.5rem; }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        
+        .btn-float {
+            position: fixed;
+            bottom: 100px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #25D366; /* WhatsApp Green */
+            color: white;
+            box-shadow: var(--shadow-floating);
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        /* Form Elements */
+        .input-group { margin-bottom: 1rem; }
+        .label { display: block; font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+        
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(0,0,0,0.1);
+            background: var(--bg-body);
+            color: var(--text-main);
+            transition: var(--trans-fast);
+        }
+
+        .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+
+        /* List Items */
+        .list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem;
+            background: rgba(0,0,0,0.02);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.5rem;
+            border-left: 3px solid transparent;
+        }
+        
+        .list-item:hover { background: rgba(0,0,0,0.04); }
+        .list-item.active { border-left-color: var(--accent); background: rgba(217, 119, 6, 0.05); }
+
+        /* Bottom Nav */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--bg-card);
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+            z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            color: var(--text-muted);
+            transition: var(--trans-fast);
+            flex: 1;
+        }
+
+        .nav-item.active { color: var(--primary); }
+        .nav-icon { width: 24px; height: 24px; margin-bottom: 4px; }
+        .nav-label { font-size: 0.7rem; font-weight: 600; }
+
+        /* Badge */
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 99px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-blue { background: rgba(59, 130, 246, 0.1); color: var(--primary-light); }
+        .badge-gold { background: rgba(217, 119, 6, 0.1); color: var(--accent); }
+
+        /* Icons (SVG wrapper) */
+        svg { fill: currentColor; }
+
+        /* Checklist Specific */
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+        }
+        
+        .checkbox-custom {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--text-muted);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--trans-fast);
+        }
+
+        .check-item.checked .checkbox-custom {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+        
+        .check-item.checked span { text-decoration: line-through; opacity: 0.6; }
+
+        /* Modal */
+        dialog {
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 0;
+            box-shadow: var(--shadow-floating);
+            background: var(--bg-card);
+            color: var(--text-main);
+            width: 90%;
+            max-width: 500px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        dialog::backdrop { background: rgba(0,0,0,0.6); backdrop-filter: blur(2px); }
+        
+        .modal-content { padding: 1.5rem; }
+    </style>
+</head>
+<body>
+
+    <!-- APP HEADER -->
+    <header>
+        <div class="container header-content">
+            <div class="app-title">
+                <span>Ministerio</span>
+                <h1>Levita OS</h1>
+            </div>
+            <button id="installBtn" class="install-btn hidden">⬇ Instalar App</button>
+        </div>
+        <div class="container" style="padding-top: 0;">
+            <p style="opacity: 0.8; font-size: 0.9rem;">"Hacedlo todo para la gloria de Dios."</p>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main id="app" class="container" style="margin-top: -2rem;">
+        
+        <!-- VIEW: SERVICE PLANNER -->
+        <section id="view-service" class="view active">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/></svg>
+                        Planificación
+                    </div>
+                    <select id="serviceType" class="input-field" style="width: auto; padding: 0.25rem;">
+                        <option value="Domingo">Domingo</option>
+                        <option value="Miércoles">Miércoles</option>
+                        <option value="Vigilia">Vigilia</option>
+                        <option value="Especial">Especial</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label class="label">Fecha del Servicio</label>
+                    <input type="date" id="serviceDate" class="input-field">
+                </div>
+            </div>
+
+            <!-- Setlist Section -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🎵 Setlist de Alabanzas</div>
+                    <button class="btn btn-ghost" onclick="app.addSongModal()">+ Agregar</button>
+                </div>
+                <div id="songsList" class="flex flex-col gap-2">
+                    <!-- Songs render here -->
+                    <div class="text-center text-muted py-4">No hay alabanzas agregadas.</div>
+                </div>
+            </div>
+
+            <!-- Roster Section -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🎸 Equipo Ministerial</div>
+                    <button class="btn btn-ghost" onclick="app.addMusicianToServiceModal()">+ Asignar</button>
+                </div>
+                <div id="serviceRoster" class="flex flex-col gap-2">
+                    <!-- Roster renders here -->
+                </div>
+            </div>
+            
+            <div style="height: 60px;"></div> <!-- Spacer for FAB -->
+        </section>
+
+        <!-- VIEW: TEAM MANAGEMENT -->
+        <section id="view-team" class="view hidden">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">👥 Base de Datos de Levitas</div>
+                    <button class="btn btn-primary" style="padding: 0.5rem 1rem;" onclick="app.openNewMemberModal()">Nuevo</button>
+                </div>
+                <div class="input-group">
+                     <input type="text" id="teamSearch" placeholder="Buscar músico..." class="input-field" onkeyup="app.renderTeam()">
+                </div>
+                <div id="teamList" class="flex flex-col gap-2">
+                    <!-- Team members render here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: CHECKLIST -->
+        <section id="view-check" class="view hidden">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">✅ Check-in de Excelencia</div>
+                    <button class="btn btn-ghost" onclick="app.resetChecklist()">Reset</button>
+                </div>
+                <div class="input-group flex gap-2">
+                    <input type="text" id="newCheckItem" placeholder="Nueva tarea..." class="input-field">
+                    <button class="btn btn-primary" onclick="app.addCheckItem()">+</button>
+                </div>
+                <div id="checklistContainer">
+                    <!-- Check items render here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: REHEARSALS -->
+        <section id="view-rehearsal" class="view hidden">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">📅 Próximos Ensayos</div>
+                    <button class="btn btn-primary" style="padding: 0.5rem;" onclick="app.addRehearsalModal()">+</button>
+                </div>
+                <div id="rehearsalList" class="flex flex-col gap-4">
+                    <!-- Rehearsals render here -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FLOATING ACTION BUTTON (WhatsApp Share) -->
+    <button id="whatsappBtn" class="btn-float" onclick="app.shareToWhatsApp()" aria-label="Compartir en WhatsApp">
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+    </button>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="nav-bar">
+        <div class="nav-item active" onclick="app.switchView('service', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            <span class="nav-label">Servicio</span>
+        </div>
+        <div class="nav-item" onclick="app.switchView('team', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            <span class="nav-label">Equipo</span>
+        </div>
+        <div class="nav-item" onclick="app.switchView('check', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            <span class="nav-label">Checklist</span>
+        </div>
+        <div class="nav-item" onclick="app.switchView('rehearsal', this)">
+            <svg class="nav-icon" viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+            <span class="nav-label">Ensayos</span>
+        </div>
+    </nav>
+
+    <!-- MODAL TEMPLATE -->
+    <dialog id="genericModal">
+        <div class="modal-content">
+            <h3 id="modalTitle" class="font-bold mb-4 text-xl">Título</h3>
+            <div id="modalBody"></div>
+            <div class="flex justify-between mt-6 gap-4">
+                <button class="btn btn-ghost w-full" onclick="document.getElementById('genericModal').close()">Cancelar</button>
+                <button id="modalActionBtn" class="btn btn-primary w-full">Guardar</button>
+            </div>
+        </div>
+    </dialog>
+
+    <script>
+        /**
+         * LEVITA OS - Core Logic
+         * Architect: SynthWeaver
+         * Principles: Clean Code, Local Persistence, Neuro-Optimized UI
+         */
+
+        // --- STORE (Local Storage Wrapper) ---
+        const Store = {
+            get: (key, defaultVal) => {
+                const data = localStorage.getItem(`levita_${key}`);
+                return data ? JSON.parse(data) : defaultVal;
+            },
+            set: (key, value) => {
+                localStorage.setItem(`levita_${key}`, JSON.stringify(value));
+            }
+        };
+
+        // --- DATA MODELS (Initial State) ---
+        const Instruments = ["Voz", "Guitarra", "Bajo", "Teclado", "Batería", "Acústica", "Violín", "Saxofón"];
+        
+        const defaultChecklist = [
+            { id: 1, text: "Encender Sistema de Audio", checked: false },
+            { id: 2, text: "Probar Micrófonos Inalámbricos (Baterías)", checked: false },
+            { id: 3, text: "Música de fondo (Ambiente) 30min antes", checked: false },
+            { id: 4, text: "Botellas de agua para el equipo", checked: false },
+            { id: 5, text: "Oración inicial del equipo", checked: false }
+        ];
+
+        // --- APP CONTROLLER ---
+        const app = {
+            data: {
+                currentService: Store.get('service', {
+                    type: 'Domingo',
+                    date: new Date().toISOString().split('T')[0],
+                    songs: [],
+                    roster: []
+                }),
+                team: Store.get('team', []),
+                checklist: Store.get('checklist', defaultChecklist),
+                rehearsals: Store.get('rehearsals', [])
+            },
+
+            init() {
+                // Initial Render
+                this.renderService();
+                this.renderTeam();
+                this.renderChecklist();
+                this.renderRehearsals();
+                
+                // Event Listeners
+                document.getElementById('serviceDate').value = this.data.currentService.date;
+                document.getElementById('serviceType').value = this.data.currentService.type;
+                
+                document.getElementById('serviceDate').addEventListener('change', (e) => {
+                    this.data.currentService.date = e.target.value;
+                    this.saveService();
+                });
+                
+                document.getElementById('serviceType').addEventListener('change', (e) => {
+                    this.data.currentService.type = e.target.value;
+                    this.saveService();
+                });
+
+                // PWA Install Prompt Logic
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    const installBtn = document.getElementById('installBtn');
+                    installBtn.classList.remove('hidden');
+                    installBtn.onclick = () => {
+                        e.prompt();
+                    };
+                });
+            },
+
+            saveService() { Store.set('service', this.data.currentService); },
+            saveTeam() { Store.set('team', this.data.team); },
+            saveChecklist() { Store.set('checklist', this.data.checklist); },
+            saveRehearsals() { Store.set('rehearsals', this.data.rehearsals); },
+
+            // --- VIEW NAVIGATION ---
+            switchView(viewName, navEl) {
+                document.querySelectorAll('.view').forEach(el => el.classList.add('hidden'));
+                document.getElementById(`view-${viewName}`).classList.remove('hidden');
+                
+                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+                navEl.classList.add('active');
+
+                // Toggle FAB based on view
+                const fab = document.getElementById('whatsappBtn');
+                if (viewName === 'service') fab.style.display = 'flex';
+                else fab.style.display = 'none';
+            },
+
+            // --- SERVICE & SONGS LOGIC ---
+            renderService() {
+                const songsContainer = document.getElementById('songsList');
+                songsContainer.innerHTML = '';
+
+                if (this.data.currentService.songs.length === 0) {
+                    songsContainer.innerHTML = `<div class="text-center text-muted py-4">Agrega alabanzas para comenzar el orden del culto.</div>`;
+                } else {
+                    this.data.currentService.songs.forEach((song, index) => {
+                        songsContainer.innerHTML += `
+                            <div class="list-item">
+                                <div class="flex items-center gap-2">
+                                    <span class="badge badge-gold">${index + 1}</span>
+                                    <span class="font-bold">${song}</span>
+                                </div>
+                                <div class="flex gap-1">
+                                    <button class="btn-ghost" onclick="app.moveSong(${index}, -1)">▲</button>
+                                    <button class="btn-ghost" onclick="app.moveSong(${index}, 1)">▼</button>
+                                    <button class="btn-ghost" style="color:var(--danger)" onclick="app.deleteSong(${index})">×</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+
+                // Render Roster in Service View
+                const rosterContainer = document.getElementById('serviceRoster');
+                rosterContainer.innerHTML = '';
+                if(this.data.currentService.roster.length === 0) {
+                    rosterContainer.innerHTML = `<div class="text-center text-muted py-2">No has asignado músicos.</div>`;
+                }
+                this.data.currentService.roster.forEach((item, index) => {
+                    rosterContainer.innerHTML += `
+                        <div class="list-item">
+                            <div>
+                                <div class="font-bold">${item.name}</div>
+                                <div class="text-xs text-muted">Instrumento: <span class="text-accent">${item.instrument}</span></div>
+                            </div>
+                            <button class="btn-ghost" style="color:var(--danger)" onclick="app.removeMusicianFromService(${index})">×</button>
+                        </div>
+                    `;
+                });
+            },
+
+            addSongModal() {
+                const modal = document.getElementById('genericModal');
+                document.getElementById('modalTitle').innerText = "Agregar Alabanza";
+                document.getElementById('modalBody').innerHTML = `
+                    <div class="input-group">
+                        <label class="label">Título de la Canción</label>
+                        <input type="text" id="modalInputSong" class="input-field" placeholder="Ej. Gracia Sublime">
+                    </div>
+                `;
+                
+                document.getElementById('modalActionBtn').onclick = () => {
+                    const title = document.getElementById('modalInputSong').value;
+                    if(title) {
+                        this.data.currentService.songs.push(title);
+                        this.saveService();
+                        this.renderService();
+                        modal.close();
+                    }
+                };
+                modal.showModal();
+            },
+
+            moveSong(index, direction) {
+                const songs = this.data.currentService.songs;
+                if (index + direction < 0 || index + direction >= songs.length) return;
+                
+                [songs[index], songs[index + direction]] = [songs[index + direction], songs[index]];
+                this.saveService();
+                this.renderService();
+            },
+
+            deleteSong(index) {
+                if(confirm("¿Eliminar esta canción del setlist?")) {
+                    this.data.currentService.songs.splice(index, 1);
+                    this.saveService();
+                    this.renderService();
+                }
+            },
+
+            // --- TEAM & ROSTER LOGIC ---
+            renderTeam() {
+                const filter = document.getElementById('teamSearch').value.toLowerCase();
+                const container = document.getElementById('teamList');
+                container.innerHTML = '';
+                
+                const filteredTeam = this.data.team.filter(m => m.name.toLowerCase().includes(filter));
+                
+                if (filteredTeam.length === 0) container.innerHTML = `<div class="text-center text-muted">No se encontraron levitas.</div>`;
+
+                filteredTeam.forEach(member => {
+                    container.innerHTML += `
+                        <div class="list-item">
+                            <div>
+                                <div class="font-bold text-primary">${member.name}</div>
+                                <div class="flex gap-1 mt-1 flex-wrap">
+                                    ${member.instruments.map(i => `<span class="badge badge-blue">${i}</span>`).join('')}
+                                </div>
+                            </div>
+                            <button class="btn-ghost text-xs" onclick="app.deleteMember('${member.id}')">Eliminar</button>
+                        </div>
+                    `;
+                });
+            },
+
+            openNewMemberModal() {
+                const modal = document.getElementById('genericModal');
+                document.getElementById('modalTitle').innerText = "Nuevo Integrante";
+                
+                let instCheckboxes = Instruments.map(inst => 
+                    `<label class="flex items-center gap-2 mb-2"><input type="checkbox" value="${inst}"> ${inst}</label>`
+                ).join('');
+
+                document.getElementById('modalBody').innerHTML = `
+                    <div class="input-group">
+                        <label class="label">Nombre Completo</label>
+                        <input type="text" id="newMemberName" class="input-field">
+                    </div>
+                    <label class="label">Instrumentos que domina:</label>
+                    <div style="max-height: 150px; overflow-y:auto; border:1px solid #eee; padding:5px;">
+                        ${instCheckboxes}
+                    </div>
+                    <div class="input-group mt-2">
+                        <label class="label">Otro Instrumento (Opcional)</label>
+                        <input type="text" id="newMemberCustomInst" class="input-field" placeholder="Ej. Cello">
+                    </div>
+                `;
+
+                document.getElementById('modalActionBtn').onclick = () => {
+                    const name = document.getElementById('newMemberName').value;
+                    if(!name) return alert("El nombre es requerido");
+
+                    const checkboxes = document.querySelectorAll('#modalBody input[type="checkbox"]:checked');
+                    let selectedInst = Array.from(checkboxes).map(cb => cb.value);
+                    
+                    const custom = document.getElementById('newMemberCustomInst').value;
+                    if(custom) selectedInst.push(custom);
+
+                    if(selectedInst.length === 0) return alert("Selecciona al menos un instrumento");
+
+                    this.data.team.push({
+                        id: Date.now().toString(),
+                        name: name,
+                        instruments: selectedInst
+                    });
+                    this.saveTeam();
+                    this.renderTeam();
+                    modal.close();
+                };
+                modal.showModal();
+            },
+
+            deleteMember(id) {
+                if(confirm("¿Eliminar a este miembro del equipo permanentemente?")) {
+                    this.data.team = this.data.team.filter(m => m.id !== id);
+                    this.saveTeam();
+                    this.renderTeam();
+                }
+            },
+
+            addMusicianToServiceModal() {
+                if(this.data.team.length === 0) return alert("Primero agrega miembros en la pestaña 'Equipo'");
+
+                const modal = document.getElementById('genericModal');
+                document.getElementById('modalTitle').innerText = "Asignar al Servicio";
+                
+                let memberOptions = this.data.team.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+
+                document.getElementById('modalBody').innerHTML = `
+                    <div class="input-group">
+                        <label class="label">Músico</label>
+                        <select id="selectMusician" class="input-field" onchange="app.updateInstSelect(this.value)">
+                            <option value="">Seleccionar...</option>
+                            ${memberOptions}
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="label">Instrumento para hoy</label>
+                        <select id="selectInstrument" class="input-field">
+                            <option>-- Selecciona músico primero --</option>
+                        </select>
+                    </div>
+                `;
+
+                // Helper inside modal scope to update instruments based on musician
+                window.app.updateInstSelect = (memberId) => {
+                    const member = this.data.team.find(m => m.id === memberId);
+                    const instSelect = document.getElementById('selectInstrument');
+                    instSelect.innerHTML = '';
+                    if(member) {
+                        member.instruments.forEach(inst => {
+                            instSelect.innerHTML += `<option value="${inst}">${inst}</option>`;
+                        });
+                    }
+                };
+
+                document.getElementById('modalActionBtn').onclick = () => {
+                    const mId = document.getElementById('selectMusician').value;
+                    const inst = document.getElementById('selectInstrument').value;
+                    
+                    if(!mId || !inst) return;
+
+                    const member = this.data.team.find(m => m.id === mId);
+                    this.data.currentService.roster.push({
+                        id: mId,
+                        name: member.name,
+                        instrument: inst
+                    });
+                    this.saveService();
+                    this.renderService();
+                    modal.close();
+                };
+                modal.showModal();
+            },
+
+            removeMusicianFromService(index) {
+                this.data.currentService.roster.splice(index, 1);
+                this.saveService();
+                this.renderService();
+            },
+
+            // --- CHECKLIST LOGIC ---
+            renderChecklist() {
+                const container = document.getElementById('checklistContainer');
+                container.innerHTML = '';
+                
+                this.data.checklist.forEach(item => {
+                    container.innerHTML += `
+                        <div class="check-item ${item.checked ? 'checked' : ''}" onclick="app.toggleCheck(${item.id})">
+                            <div class="checkbox-custom">
+                                ${item.checked ? '✓' : ''}
+                            </div>
+                            <span class="flex-1">${item.text}</span>
+                            <button class="btn-ghost" style="color:var(--text-muted)" onclick="event.stopPropagation(); app.deleteCheckItem(${item.id})">×</button>
+                        </div>
+                    `;
+                });
+            },
+
+            toggleCheck(id) {
+                const item = this.data.checklist.find(i => i.id === id);
+                if(item) {
+                    item.checked = !item.checked;
+                    this.saveChecklist();
+                    this.renderChecklist();
+                }
+            },
+
+            addCheckItem() {
+                const input = document.getElementById('newCheckItem');
+                if(!input.value) return;
+                
+                this.data.checklist.push({
+                    id: Date.now(),
+                    text: input.value,
+                    checked: false
+                });
+                input.value = '';
+                this.saveChecklist();
+                this.renderChecklist();
+            },
+
+            deleteCheckItem(id) {
+                this.data.checklist = this.data.checklist.filter(i => i.id !== id);
+                this.saveChecklist();
+                this.renderChecklist();
+            },
+
+            resetChecklist() {
+                if(confirm("¿Reiniciar todas las marcas del checklist?")) {
+                    this.data.checklist.forEach(i => i.checked = false);
+                    this.saveChecklist();
+                    this.renderChecklist();
+                }
+            },
+
+            // --- REHEARSALS LOGIC ---
+            renderRehearsals() {
+                const container = document.getElementById('rehearsalList');
+                container.innerHTML = '';
+                if(this.data.rehearsals.length === 0) {
+                    container.innerHTML = `<div class="text-center text-muted">No hay ensayos programados.</div>`;
+                    return;
+                }
+
+                // Sort by date
+                this.data.rehearsals.sort((a,b) => new Date(a.date) - new Date(b.date));
+
+                this.data.rehearsals.forEach((rh, index) => {
+                    // Format Date nicely
+                    const d = new Date(rh.date);
+                    const dateStr = d.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+                    container.innerHTML += `
+                        <div class="list-item flex-col items-start gap-2">
+                            <div class="flex justify-between w-full">
+                                <span class="badge badge-blue">ENSAYO</span>
+                                <button class="btn-ghost text-xs text-danger" onclick="app.deleteRehearsal(${index})">Eliminar</button>
+                            </div>
+                            <div class="font-bold text-lg capitalize">${dateStr}</div>
+                            <div class="text-sm text-muted italic">"${rh.note || 'Sin notas'}"</div>
+                        </div>
+                    `;
+                });
+            },
+
+            addRehearsalModal() {
+                const modal = document.getElementById('genericModal');
+                document.getElementById('modalTitle').innerText = "Programar Ensayo";
+                document.getElementById('modalBody').innerHTML = `
+                    <div class="input-group">
+                        <label class="label">Fecha y Hora</label>
+                        <input type="datetime-local" id="rhDate" class="input-field">
+                    </div>
+                    <div class="input-group">
+                        <label class="label">Notas / Enfoque</label>
+                        <textarea id="rhNote" class="input-field" rows="3" placeholder="Ej. Repasar canciones nuevas..."></textarea>
+                    </div>
+                `;
+
+                document.getElementById('modalActionBtn').onclick = () => {
+                    const date = document.getElementById('rhDate').value;
+                    const note = document.getElementById('rhNote').value;
+                    if(!date) return alert("Fecha requerida");
+
+                    this.data.rehearsals.push({ date, note });
+                    this.saveRehearsals();
+                    this.renderRehearsals();
+                    modal.close();
+                };
+                modal.showModal();
+            },
+
+            deleteRehearsal(index) {
+                if(confirm("¿Eliminar este ensayo?")) {
+                    this.data.rehearsals.splice(index, 1);
+                    this.saveRehearsals();
+                    this.renderRehearsals();
+                }
+            },
+
+            // --- WHATSAPP SHARE ---
+            shareToWhatsApp() {
+                const svc = this.data.currentService;
+                
+                // Format Date
+                const dateObj = new Date(svc.date);
+                const dateStr = dateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+
+                let text = `🔥 *ORDEN DEL SERVICIO - LEVITA OS* 🔥\n\n`;
+                text += `🗓️ *${svc.type} - ${dateStr}*\n\n`;
+                
+                text += `🎶 *SETLIST:*\n`;
+                if(svc.songs.length > 0) {
+                    svc.songs.forEach((s, i) => text += `${i+1}. ${s}\n`);
+                } else {
+                    text += `(Pendiente)\n`;
+                }
+
+                text += `\n🎸 *EQUIPO MINISTERIAL:*\n`;
+                if(svc.roster.length > 0) {
+                    svc.roster.forEach(m => text += `▫️ ${m.name} (${m.instrument})\n`);
+                } else {
+                    text += `(Por confirmar)\n`;
+                }
+
+                text += `\n_Preparémonos en excelencia y espíritu._ 🙌`;
+
+                const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                window.open(url, '_blank');
+            }
+        };
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+
+    </script>
+</body>
+</html>
+
